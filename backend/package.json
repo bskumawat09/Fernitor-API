@@ -1,0 +1,25 @@
+{
+  "name": "te-furniture-store",
+  "version": "1.0.0",
+  "description": "TE group mini project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bskumawat09/TE-Furniture-Store.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bskumawat09/TE-Furniture-Store/issues"
+  },
+  "homepage": "https://github.com/bskumawat09/TE-Furniture-Store#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "joi": "^17.4.2",
+    "mongoose": "^5.13.6"
+  }
+}
