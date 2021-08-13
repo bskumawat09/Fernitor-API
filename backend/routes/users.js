@@ -28,15 +28,22 @@ router.get('/logout', (req, res) => {
 
 // get single user (tested)
 router.get('/:id', async (req, res) => {
-    const user = await User.findById(req.params.id).populate('cart');
-    res.json({ user: user });
+    try {
+        const user = await User.findById(req.params.id).populate('cart');
+        res.json({ user: user });
+    } catch (e) {
+        res.json({ message: e });
+    }
 })
 
 // get cart associated with the user (tested)
 router.get('/:id/cart', async (req, res) => {
-    const user = await User.findById(req.params.id).populate('cart');
-    const cart = user.cart;
-    res.json({ cart: cart });
+    try {
+        const user = await User.findById(req.params.id).populate('cart');
+        res.json({ cart: user.cart });
+    } catch (e) {
+        res.json({ message: e });
+    }
 })
 
 module.exports = router;

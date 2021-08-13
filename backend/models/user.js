@@ -11,12 +11,10 @@ const userSchema = new Schema({
     phone: String,
     address: String,
     country: String,
-    cart: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Product'
-        }
-    ],
+    cart: {
+        type: Schema.Types.ObjectId,
+        ref: 'Cart'
+    },
     date: {
         type: Date,
         default: Date.now

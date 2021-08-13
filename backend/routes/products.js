@@ -1,5 +1,6 @@
 const express = require('express');
 const Product = require('../models/product');
+const Cart = require('../models/cart');
 const { productSchema } = require('../schema');
 
 const router = express.Router();
@@ -62,16 +63,27 @@ router.get('/category/:category', async (req, res) => {
     res.json({ products: products });
 })
 
-// add product to cart (tested)
-router.put('/:id/cart', async (req, res) => {
-    const { id } = req.params;
-    const product = await Product.findById(id).populate('seller');
+// add product to cart
+router.post('/:id/cart', async (req, res) => {
+    const { id } = req.params;  // product id
+    const { quantity } = req.body;
+    const product = await Product.findById(id).populate({
+        path: 'seller',
+        populate: { path: 'cart' }
+    });
     const user = product.seller;    // TODO: replace by current logged in user
-    user.cart.push(id);
+    if (!user.cart) {
+        user.cart = new Cart();
+    }
+    user.cart.items.push({ _id: id, quantity });
+    user.cart.bill += quantity * product.price;
+
+    await user.cart.save();
     await user.save();
+
     res.json({
-        message: "added product to cart",
-        product: product
+        message: "product added to cart",
+        cart: user.cart,
     });
 })
 
