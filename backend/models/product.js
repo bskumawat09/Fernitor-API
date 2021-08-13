@@ -5,7 +5,15 @@ const Schema = mongoose.Schema;
 const productSchema = new Schema({
     name: String,
     price: Number,
-    category: String,
+    color: {
+        type: String,
+        lowercase: true,
+        default: null
+    },
+    category: {
+        type: String,
+        lowercase: true
+    },
     quantity: Number,
     description: {
         type: String,
