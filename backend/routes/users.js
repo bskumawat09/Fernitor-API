@@ -1,27 +1,53 @@
 const express = require('express');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
+const createToken = (id) => {
+    const secret = process.env.SECRET;
+    return jwt.sign({ id }, secret, { expiresIn: 24 * 60 * 60 });
+}
+
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, phone, address, country } = req.body.user;
-        const newUser = new User({ name, email, phone, address, country });
+        const { name, email, password, phone, address, country } = req.body;
+        const newUser = new User({ name, email, password, phone, address, country });
         await newUser.save();
-        res.json({
+
+        await User.login(email, password);
+
+        const token = createToken(newUser._id);
+        res.cookie('jwt', token, { httpOnly: true });
+
+        res.status(201).json({
             message: "registered successfully",
             user: newUser
         });
     } catch (e) {
-        res.json({ message: e });
+        res.status(400).json({ error: e.message });
     }
 })
 
-router.post('/login', (req, res) => {
-    res.json({ message: "logged in" });
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.login(email, password);
+
+        const token = createToken(user._id);
+        res.cookie('jwt', token, { httpOnly: true });
+
+        res.status(200).json({
+            message: 'login successful',
+            user: user._id
+        });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
 })
 
 router.get('/logout', (req, res) => {
+    res.cookie('jwt', '', { maxAge: 1 });
     res.json({ message: "logged out" });
 })
 
@@ -31,7 +57,7 @@ router.get('/:id', async (req, res) => {
         const user = await User.findById(req.params.id).populate('cart');
         res.json({ user: user });
     } catch (e) {
-        res.json({ message: e });
+        res.json({ error: e.message });
     }
 })
 
@@ -41,7 +67,7 @@ router.get('/:id/cart', async (req, res) => {
         const user = await User.findById(req.params.id).populate('cart');
         res.json({ cart: user.cart });
     } catch (e) {
-        res.json({ message: e });
+        res.json({ error: e });
     }
 })
 

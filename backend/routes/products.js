@@ -1,20 +1,9 @@
 const express = require('express');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
-const { productSchema } = require('../schema');
+const { isLoggedIn, validateProduct } = require('../middleware');
 
 const router = express.Router();
-
-// schema validation (server-side) with joi
-const validateProduct = (req, res, next) => {
-    const { error } = productSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(ele => ele.message).join(',');
-        throw new Error(msg);
-    } else {
-        next();
-    }
-}
 
 // get all products (tested)
 router.get('/', async (req, res) => {
@@ -23,8 +12,9 @@ router.get('/', async (req, res) => {
 })
 
 // create new product (tested)
-router.post('/', validateProduct, async (req, res) => {
-    const newProduct = new Product(req.body.product);
+router.post('/', isLoggedIn, validateProduct, async (req, res) => {
+    const { product } = req.body;
+    const newProduct = new Product(product);
     await newProduct.save();
     res.json({ product: newProduct });
 })
@@ -39,7 +29,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // edit product (tested)
-router.put('/:id', async (req, res) => {
+router.put('/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
     const { product } = req.body;
     const updatedProduct = await Product.findByIdAndUpdate(id, { $set: product }, { new: true });
@@ -47,7 +37,7 @@ router.put('/:id', async (req, res) => {
 })
 
 // delete product (tested)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
     await Product.findByIdAndDelete(id);
     res.json({ message: "product is deleted" });
@@ -64,7 +54,7 @@ router.get('/category/:category', async (req, res) => {
 })
 
 // add product to cart
-router.post('/:id/cart', async (req, res) => {
+router.post('/:id/cart', isLoggedIn, async (req, res) => {
     const { id } = req.params;  // product id
     const { quantity } = req.body;
     const product = await Product.findById(id).populate({

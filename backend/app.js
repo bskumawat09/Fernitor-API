@@ -7,6 +7,7 @@ const path = require('path');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const reviewRoutes = require('./routes/reviews');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -21,6 +22,8 @@ connectDB(dbUrl);
 
 /* middlewares */
 app.use(express.json());
+app.use(cookieParser());
+
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products/:id/reviews', reviewRoutes);
