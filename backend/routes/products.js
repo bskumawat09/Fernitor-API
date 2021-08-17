@@ -7,7 +7,17 @@ const router = express.Router();
 
 // get all products (tested)
 router.get('/', async (req, res) => {
-    const products = await Product.find();
+    // for filtering
+    let queryObj = { ...req.query }; // make a copy (not reference) of query object
+    const exclude = ['sort', 'limit', 'page'];
+    exclude.forEach(el => delete queryObj[el]);
+
+    // for advance filtering
+    let queryString = JSON.stringify(queryObj);
+    queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    queryObj = JSON.parse(queryString);
+
+    const products = await Product.find(queryObj);
     res.json({ products: products });
 })
 
@@ -41,16 +51,6 @@ router.delete('/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
     await Product.findByIdAndDelete(id);
     res.json({ message: "product is deleted" });
-})
-
-// get all products with given category (tested)
-router.get('/category/:category', async (req, res) => {
-    const { category } = req.params;
-    const products = await Product.find({ category: category });
-    if (!products) {
-        return res.json({ message: 'no product found for this category' });
-    }
-    res.json({ products: products });
 })
 
 // add product to cart
