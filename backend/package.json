@@ -2,9 +2,9 @@
   "name": "te-furniture-store",
   "version": "1.0.0",
   "description": "TE group mini project.",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node backend/app.js"
   },
   "repository": {
     "type": "git",

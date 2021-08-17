@@ -1,5 +1,0 @@
-node_modules
-.env
-routes/admin.js
-routes/orders.js
-models/order.js

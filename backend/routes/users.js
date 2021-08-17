@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const { validateUser } = require('../middleware')
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ const createToken = (id) => {
     return jwt.sign({ id }, secret, { expiresIn: 24 * 60 * 60 });
 }
 
-router.post('/register', async (req, res) => {
+router.post('/register', validateUser, async (req, res) => {
     try {
         const { name, email, password, phone, address, country } = req.body;
         const newUser = new User({ name, email, password, phone, address, country });

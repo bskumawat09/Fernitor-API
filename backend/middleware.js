@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { productSchema } = require('./schema');
+const { productSchema, userSchema, reviewSchema } = require('./schema');
 
 module.exports.isLoggedIn = (req, res, next) => {
     const secret = process.env.SECRET;
@@ -22,6 +22,26 @@ module.exports.isLoggedIn = (req, res, next) => {
 
 module.exports.validateProduct = (req, res, next) => {
     const { error } = productSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(ele => ele.message).join(',');
+        throw new Error(msg);
+    } else {
+        next();
+    }
+}
+
+module.exports.validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(ele => ele.message).join(',');
+        throw new Error(msg);
+    } else {
+        next();
+    }
+}
+
+module.exports.validateUser = (req, res, next) => {
+    const { error } = userSchema.validate(req.body);
     if (error) {
         const msg = error.details.map(ele => ele.message).join(',');
         throw new Error(msg);

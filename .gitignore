@@ -1,0 +1,5 @@
+backend/node_modules
+.env
+backend/routes/admin.js
+backend/routes/orders.js
+backend/models/order.js
