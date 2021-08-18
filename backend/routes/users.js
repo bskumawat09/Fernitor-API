@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-const { validateUser } = require('../middleware')
+const { validateUser } = require('../middleware');
 
 const router = express.Router();
 
@@ -12,11 +12,11 @@ const createToken = (id) => {
 
 router.post('/register', validateUser, async (req, res) => {
     try {
-        const { name, email, password, phone, address, country } = req.body;
-        const newUser = new User({ name, email, password, phone, address, country });
+        const { user } = req.body;
+        const newUser = new User(user);
         await newUser.save();
 
-        await User.login(email, password);
+        await User.login(user.email, user.password);
 
         const token = createToken(newUser._id);
         res.cookie('jwt', token, { httpOnly: true });
@@ -32,7 +32,7 @@ router.post('/register', validateUser, async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password } = req.body.user;
         const user = await User.login(email, password);
 
         const token = createToken(user._id);

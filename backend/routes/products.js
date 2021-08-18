@@ -2,8 +2,12 @@ const express = require('express');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const { isLoggedIn, validateProduct } = require('../middleware');
+const multer = require('multer');
+const { multerStorage } = require('../cloudinary');
 
 const router = express.Router();
+
+const upload = multer({ storage: multerStorage });
 
 // get all products (tested)
 router.get('/', async (req, res) => {
@@ -22,9 +26,13 @@ router.get('/', async (req, res) => {
 })
 
 // create new product (tested)
-router.post('/', isLoggedIn, validateProduct, async (req, res) => {
+router.post('/', isLoggedIn, upload.single('image'), validateProduct, async (req, res) => {
     const { product } = req.body;
     const newProduct = new Product(product);
+    const imgFile = req.file;
+    if (imgFile) {
+        newProduct.image = { url: imgFile.path, filename: imgFile.filename };
+    }
     await newProduct.save();
     res.json({ product: newProduct });
 })
@@ -39,10 +47,15 @@ router.get('/:id', async (req, res) => {
 })
 
 // edit product (tested)
-router.put('/:id', isLoggedIn, async (req, res) => {
+router.put('/:id', isLoggedIn, upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { product } = req.body;
     const updatedProduct = await Product.findByIdAndUpdate(id, { $set: product }, { new: true });
+    const imgFile = req.file;
+    if (imgFile) {
+        updatedProduct.image = { url: imgFile.path, filename: imgFile.filename };
+        await updatedProduct.save();
+    }
     res.json({ product: updatedProduct });
 })
 
