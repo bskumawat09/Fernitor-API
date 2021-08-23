@@ -4,7 +4,7 @@
   "description": "TE group mini project.",
   "main": "app.js",
   "scripts": {
-    "start": "node backend/app.js"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
