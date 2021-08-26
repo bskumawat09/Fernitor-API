@@ -8,6 +8,7 @@ const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const reviewRoutes = require('./routes/reviews');
 const cookieParser = require('cookie-parser');
+const Cors = require('cors');
 
 const app = express();
 
@@ -23,6 +24,7 @@ connectDB(dbUrl);
 /* middlewares */
 app.use(express.json());
 app.use(cookieParser());
+app.use(Cors());
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
