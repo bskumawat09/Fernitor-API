@@ -7,7 +7,23 @@ const reviewSchema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    product: {
+        type: Schema.Types.ObjectId,
+        ref: 'Product'
+    },
+    date: {
+        type: Date,
+        default: Date.now
     }
+});
+
+reviewSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'author',
+        select: 'name email -cart'
+    });
+    next();
 });
 
 module.exports = mongoose.model('Review', reviewSchema);

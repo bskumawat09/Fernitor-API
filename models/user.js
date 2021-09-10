@@ -9,6 +9,11 @@ const userSchema = new Schema({
         unique: [true, 'email already exist'],
         lowercase: true
     },
+    role: {
+        type: String,
+        enum: ['user', 'seller', 'admin'],
+        default: 'user'
+    },
     password: String,
     phone: {
         type: String,
@@ -28,8 +33,11 @@ const userSchema = new Schema({
 
 // mongoose middleware
 userSchema.pre('save', async function (next) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    // runs only if the password is modified
+    if (this.isModified('password')) {
+        const salt = await bcrypt.genSalt(12);
+        this.password = await bcrypt.hash(this.password, salt);
+    }
     next();
 });
 
@@ -45,5 +53,11 @@ userSchema.statics.login = async function (email, password) {
     }
     throw new Error('incorrect email');
 }
+
+// query middleware
+userSchema.pre(/^find/, function (next) {
+    this.populate('cart');
+    next();
+});
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,93 +1,42 @@
 const express = require('express');
-const Product = require('../models/product');
-const Cart = require('../models/cart');
 const { isLoggedIn, validateProduct } = require('../middleware');
 const multer = require('multer');
 const { multerStorage } = require('../cloudinary');
+const productController = require('../controllers/products');
 
 const router = express.Router();
 
 const upload = multer({ storage: multerStorage });
 
-// get all products (tested)
-router.get('/', async (req, res) => {
-    // for filtering
-    let queryObj = { ...req.query }; // make a copy (not reference) of query object
-    const exclude = ['sort', 'limit', 'page'];
-    exclude.forEach(el => delete queryObj[el]);
+// get all products
+router.get('/',
+    productController.getProducts
+);
 
-    // for advance filtering
-    let queryString = JSON.stringify(queryObj);
-    queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-    queryObj = JSON.parse(queryString);
+// create new product
+router.post('/',
+    isLoggedIn,
+    upload.single('image'),
+    validateProduct,
+    productController.addNewProduct
+);
 
-    const products = await Product.find(queryObj);
-    res.json({ products: products });
-})
+// get single product
+router.get('/:id',
+    productController.getSingleProduct
+);
 
-// create new product (tested)
-router.post('/', isLoggedIn, upload.single('image'), validateProduct, async (req, res) => {
-    const { product } = req.body;
-    const newProduct = new Product(product);
-    const imgFile = req.file;
-    if (imgFile) {
-        newProduct.image = { url: imgFile.path, filename: imgFile.filename };
-    }
-    await newProduct.save();
-    res.json({ product: newProduct });
-})
+// edit product
+router.put('/:id',
+    isLoggedIn,
+    upload.single('image'),
+    productController.editProduct
+);
 
-// get single product (tested)
-router.get('/:id', async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('seller').populate('reviews');
-    if (!product) {
-        return res.json({ message: 'product not found' });
-    }
-    res.json({ product: product });
-})
-
-// edit product (tested)
-router.put('/:id', isLoggedIn, upload.single('image'), async (req, res) => {
-    const { id } = req.params;
-    const { product } = req.body;
-    const updatedProduct = await Product.findByIdAndUpdate(id, { $set: product }, { new: true });
-    const imgFile = req.file;
-    if (imgFile) {
-        updatedProduct.image = { url: imgFile.path, filename: imgFile.filename };
-        await updatedProduct.save();
-    }
-    res.json({ product: updatedProduct });
-})
-
-// delete product (tested)
-router.delete('/:id', isLoggedIn, async (req, res) => {
-    const { id } = req.params;
-    await Product.findByIdAndDelete(id);
-    res.json({ message: "product is deleted" });
-})
-
-// add product to cart
-router.post('/:id/cart', isLoggedIn, async (req, res) => {
-    const { id } = req.params;  // product id
-    const { quantity } = req.body;
-    const product = await Product.findById(id).populate({
-        path: 'seller',
-        populate: { path: 'cart' }
-    });
-    const user = product.seller;    // TODO: replace by current logged in user
-    if (!user.cart) {
-        user.cart = new Cart();
-    }
-    user.cart.items.push({ _id: id, quantity });
-    user.cart.bill += quantity * product.price;
-
-    await user.cart.save();
-    await user.save();
-
-    res.json({
-        message: "product added to cart",
-        cart: user.cart,
-    });
-})
+// delete product
+router.delete('/:id',
+    isLoggedIn,
+    productController.removeProduct
+);
 
 module.exports = router;
