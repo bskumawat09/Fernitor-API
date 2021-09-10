@@ -9,7 +9,10 @@ module.exports.getUser = catchAsync(async (req, res, next) => {
     if (!user) {
         return next(new AppError('user not found', 404));
     }
-    res.status(200).json({ user: user });
+    res.status(200).json({
+        status: 'success',
+        user: user
+    });
 })
 
 module.exports.getUserCart = catchAsync(async (req, res, next) => {
@@ -23,7 +26,14 @@ module.exports.getUserCart = catchAsync(async (req, res, next) => {
         const product = await Product.findById(item._id);
         products.push(product);
     }
-    res.status(200).json({ products: products });
+    res.status(200).json({
+        status: 'success',
+        result: products.length,
+        cart: {
+            amount: user.cart.bill,
+            products: products
+        }
+    });
 })
 
 module.exports.addToCart = catchAsync(async (req, res) => {
@@ -49,7 +59,10 @@ module.exports.addToCart = catchAsync(async (req, res) => {
         await cart.save();
     }
     await user.save();
-    res.status(201).redirect(`/users/${user._id}/cart`);
+    res.status(201).json({
+        status: 'success',
+        message: 'product added to cart successfully'
+    });
 })
 
 // module.exports.removeFromCart = catchAsync(async (req, res, next) => {
@@ -65,5 +78,9 @@ module.exports.addToCart = catchAsync(async (req, res) => {
 
 module.exports.getUserProducts = catchAsync(async (req, res, next) => {
     const products = await Product.find({ seller: req.params.id });
-    res.status(200).render({ products: products });
+    res.status(200).json({
+        status: 'success',
+        result: products.length,
+        products: products
+    });
 })
