@@ -5,7 +5,8 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 module.exports.getUser = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.params.id);
+    // const user = await User.findById(req.params.id);
+    const { user } = req;
     if (!user) {
         return next(new AppError('user not found', 404));
     }
@@ -41,7 +42,7 @@ module.exports.addToCart = catchAsync(async (req, res) => {
     // const { quantity } = req.body;
     let quantity = 1;
     const product = await Product.findById(pid);
-    const user = await User.findById(res.locals.currentUser.id);
+    const { user } = req;
     if (!user) {
         return next(new AppError('user not found', 404));
     }

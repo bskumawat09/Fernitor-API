@@ -32,8 +32,8 @@ module.exports.register = catchAsync(async (req, res, next) => {
 
     await User.login(user.email, user.password);
 
-    const token = createToken(newUser._id);
-    res.cookie('jwt', token, { httpOnly: true });
+    // const token = createToken(newUser._id);
+    // res.cookie('jwt', token, { httpOnly: true });
 
     res.status(201).json({
         status: 'success',

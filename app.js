@@ -13,6 +13,7 @@ const userRoutes = require('./routes/users');
 const reviewRoutes = require('./routes/reviews');
 const AppError = require('./utils/appError');
 const errorHandler = require('./controllers/errors');
+const { authenticate } = require('./middleware');
 
 const app = express();
 
@@ -29,12 +30,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(Cors());
 
-// middleware to provide access to these fields in our templates directly, no need to pass explicitly
-app.use((req, res, next) => {
-    const accessToken = req.cookies.jwt;
-    res.locals.currentUser = jwt.decode(accessToken, process.SECRET);
-    next();
-});
+// middleware for setting req.user
+app.use(authenticate);
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);

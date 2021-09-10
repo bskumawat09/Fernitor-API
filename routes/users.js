@@ -1,5 +1,5 @@
 const express = require('express');
-const { validateUser, isLoggedIn } = require('../middleware');
+const { validateUser, isLoggedIn, permit } = require('../middleware');
 const userController = require('../controllers/users');
 const authController = require('../controllers/auth');
 
@@ -19,7 +19,7 @@ router.get('/logout',
 );
 
 // get single user
-router.get('/:id',
+router.get('/account',
     isLoggedIn,
     userController.getUser
 );
@@ -39,6 +39,7 @@ router.post('/cart/:pid',
 // get all the products associated with the user
 router.get('/:id/products',
     isLoggedIn,
+    permit('seller'),
     userController.getUserProducts
 );
 
