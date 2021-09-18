@@ -4,16 +4,6 @@ const User = require('./models/user');
 const AppError = require('./utils/appError');
 const catchAsync = require('./utils/catchAsync');
 
-// middleware to set req.user
-module.exports.authenticate = catchAsync(async (req, res, next) => {
-    const accessToken = req.cookies.jwt;
-    if (accessToken) {
-        const { id } = jwt.decode(accessToken, process.SECRET);
-        req.user = await User.findById(id);
-    }
-    next();
-})
-
 // middleware for authentication
 module.exports.isLoggedIn = (req, res, next) => {
     const secret = process.env.SECRET;
@@ -28,13 +18,15 @@ module.exports.isLoggedIn = (req, res, next) => {
             console.log(err.message);
             return next(new AppError(err.message, 400));
         }
-        console.log(decodedToken);
 
         const loggedUser = await User.findById(decodedToken.id);
         // if the user belonging to this token no longer exists
         if (!loggedUser) {
             return next(new AppError('user belonging to this token no longer exists', 404));
         }
+        req.user = decodedToken;
+        console.log("req.user", req.user);
+
         next();
     }));
 }

@@ -5,7 +5,6 @@ if (process.env.NODE_ENV !== "production") {
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const Cors = require('cors');
-const jwt = require('jsonwebtoken');
 
 const { connectDB } = require('./dbconnect');
 const productRoutes = require('./routes/products');
@@ -13,7 +12,6 @@ const userRoutes = require('./routes/users');
 const reviewRoutes = require('./routes/reviews');
 const AppError = require('./utils/appError');
 const errorHandler = require('./controllers/errors');
-const { authenticate } = require('./middleware');
 
 const app = express();
 
@@ -29,9 +27,6 @@ connectDB(dbUrl);
 app.use(express.json());
 app.use(cookieParser());
 app.use(Cors());
-
-// middleware for setting req.user
-app.use(authenticate);
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);

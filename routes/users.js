@@ -10,6 +10,11 @@ router.post('/register',
     authController.register
 );
 
+router.post('/registerSeller',
+    validateUser,
+    authController.registerSeller
+);
+
 router.post('/login',
     authController.login
 );
