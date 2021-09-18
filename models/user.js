@@ -2,34 +2,33 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 
-const userSchema = new Schema({
-    name: String,
-    email: {
-        type: String,
-        unique: [true, 'email already exist'],
-        lowercase: true
+const userSchema = new Schema(
+    {
+        name: String,
+        email: {
+            type: String,
+            unique: [true, 'email already exist'],
+            lowercase: true
+        },
+        role: {
+            type: String,
+            enum: ['user', 'seller', 'admin'],
+            default: 'user'
+        },
+        password: String,
+        phone: {
+            type: String,
+            unique: [true, 'phone number already exist']
+        },
+        address: String,
+        country: String,
+        cart: {
+            type: Schema.Types.ObjectId,
+            ref: 'Cart'
+        }
     },
-    role: {
-        type: String,
-        enum: ['user', 'seller', 'admin'],
-        default: 'user'
-    },
-    password: String,
-    phone: {
-        type: String,
-        unique: [true, 'phone number already exist']
-    },
-    address: String,
-    country: String,
-    cart: {
-        type: Schema.Types.ObjectId,
-        ref: 'Cart'
-    },
-    date: {
-        type: Date,
-        default: Date.now
-    }
-});
+    { timestamps: true }
+);
 
 // mongoose middleware
 userSchema.pre('save', async function (next) {

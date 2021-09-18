@@ -3,4 +3,3 @@ node_modules
 seeds
 routes/admin.js
 routes/orders.js
-models/order.js
