@@ -12,7 +12,7 @@ const reviewSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Product'
     },
-    date: {
+    createdAt: {
         type: Date,
         default: Date.now
     }

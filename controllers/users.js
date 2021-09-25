@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 module.exports.getUser = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
         return next(new AppError('user not found', 404));
     }
@@ -23,7 +23,7 @@ module.exports.getUserCart = catchAsync(async (req, res, next) => {
 
     const products = [];
     for (let item of user.cart.items) {
-        const product = await Product.findById(item._id);
+        const product = await Product.findById(item._id).select('-createdAt -updatedAt');
         products.push(product);
     }
     res.status(200).json({
@@ -40,23 +40,17 @@ module.exports.addToCart = catchAsync(async (req, res) => {
     const { pid } = req.params;
     let quantity = 1;
     const product = await Product.findById(pid);
+
     const user = await User.findById(req.user.id);
     if (!user) {
         return next(new AppError('user not found', 404));
     }
 
-    if (!user.cart) {
-        user.cart = new Cart();
-        user.cart.items.push({ _id: pid, quantity });
-        user.cart.bill += quantity * product.price;
-        await user.cart.save();
-    }
-    else {
-        const cart = await Cart.findById(user.cart);
-        cart.items.push({ _id: pid, quantity });
-        cart.bill += quantity * product.price;
-        await cart.save();
-    }
+    const cart = await Cart.findById(user.cart);
+    cart.items.push({ _id: pid, quantity });
+    cart.bill += quantity * product.price;
+    await cart.save();
+
     await user.save();
     res.status(201).json({
         status: 'success',

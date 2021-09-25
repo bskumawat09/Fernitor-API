@@ -2,39 +2,38 @@ const mongoose = require('mongoose');
 const Review = require('./review');
 const Schema = mongoose.Schema;
 
-const productSchema = new Schema({
-    name: {
-        type: String,
-        unique: [true, 'product with the same name already exist']
+const productSchema = new Schema(
+    {
+        name: {
+            type: String,
+            unique: [true, 'product with the same name already exist']
+        },
+        price: Number,
+        image: {
+            url: String,
+            filename: String
+        },
+        color: {
+            type: String,
+            lowercase: true,
+            default: null
+        },
+        category: {
+            type: String,
+            lowercase: true
+        },
+        quantity: Number,
+        description: {
+            type: String,
+            default: null
+        },
+        seller: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }
     },
-    price: Number,
-    image: {
-        url: String,
-        filename: String
-    },
-    color: {
-        type: String,
-        lowercase: true,
-        default: null
-    },
-    category: {
-        type: String,
-        lowercase: true
-    },
-    quantity: Number,
-    description: {
-        type: String,
-        default: null
-    },
-    seller: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    date: {
-        type: Date,
-        default: Date.now
-    }
-});
+    { timestamps: true }
+);
 
 // virtual populate
 productSchema.virtual('reviews', {
@@ -55,7 +54,7 @@ productSchema.post('findOneAndDelete', async (doc) => {
 productSchema.pre(/^find/, function (next) {
     this.populate({
         path: 'seller',
-        select: '-__v -password -date',
+        select: '-__v -password -createdAt -updatedAt',
         populate: { path: 'cart' }
     });
     next();

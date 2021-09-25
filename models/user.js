@@ -15,7 +15,9 @@ const userSchema = new Schema(
             enum: ['user', 'seller', 'admin'],
             default: 'user'
         },
-        password: String,
+        password: {
+            type: String,
+        },
         phone: {
             type: String,
             unique: [true, 'phone number already exist']
@@ -46,7 +48,8 @@ userSchema.statics.login = async function (email, password) {
     if (user) {
         const isMatched = await bcrypt.compare(password, user.password);
         if (isMatched) {
-            return user;
+            const { password, ...others } = user._doc;
+            return others;
         }
         throw new Error('incorrect password');
     }

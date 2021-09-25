@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Cart = require('../models/cart');
 const jwt = require('jsonwebtoken');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -30,7 +31,12 @@ module.exports.register = catchAsync(async (req, res) => {
     const newUser = new User(user);
     await newUser.save();
 
-    await User.login(user.email, user.password);
+    // create cart for each new user
+    newUser.cart = new Cart();
+    await newUser.cart.save();
+    await newUser.save();
+
+    const registeredUser = await User.login(user.email, user.password);
 
     const token = createToken(newUser._id, newUser.role);
     res.cookie('jwt', token, { httpOnly: true });
@@ -38,7 +44,7 @@ module.exports.register = catchAsync(async (req, res) => {
     res.status(201).json({
         status: "success",
         message: "registered successfully",
-        user: newUser
+        user: registeredUser
     });
 })
 
@@ -48,7 +54,10 @@ module.exports.registerSeller = catchAsync(async (req, res) => {
     const newSeller = new User(seller);
     await newSeller.save();
 
-    await User.login(user.email, user.password);
+    await User.login(seller.email, seller.password);
+
+    const token = createToken(newSeller._id, newSeller.role);
+    res.cookie('jwt', token, { httpOnly: true });
 
     res.status(201).json({
         status: "success",

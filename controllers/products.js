@@ -23,6 +23,8 @@ module.exports.getProducts = catchAsync(async (req, res) => {
 
 module.exports.addNewProduct = catchAsync(async (req, res) => {
     const { product } = req.body;
+    product.seller = req.user.id;
+
     const newProduct = new Product(product);
     const imgFile = req.file;
     if (imgFile) {
@@ -40,7 +42,7 @@ module.exports.getSingleProduct = catchAsync(async (req, res, next) => {
         path: 'reviews',
         populate: {
             path: 'author',  // review's author
-            select: '-__v -password -date'
+            select: '-__v -password -createdAt -updatedAt'
         }
     });
     if (!product) {

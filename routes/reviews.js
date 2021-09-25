@@ -9,10 +9,14 @@ const router = express.Router({ mergeParams: true });
 router.post('/', isLoggedIn, validateReview, async (req, res) => {
     const product = await Product.findById(req.params.id);
     const review = new Review(req.body.review);
-    product.reviews.push(review);
+    review.author = req.user.id;
+    review.product = product._id;
+
     await review.save();
     await product.save();
-    res.json({
+
+    res.status(201).json({
+        status: "success",
         message: "added new review",
         review: review
     });
@@ -21,9 +25,12 @@ router.post('/', isLoggedIn, validateReview, async (req, res) => {
 // delete review
 router.delete('/:reviewId', isLoggedIn, async (req, res) => {
     const { id, reviewId } = req.params;
-    await Product.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);
-    res.json({ message: "review deleted" });
+
+    res.status(201).json({
+        status: "success",
+        message: "review deleted"
+    });
 });
 
 module.exports = router;
