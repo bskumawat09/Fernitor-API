@@ -23,4 +23,12 @@ const cartSchema = new Schema({
     }
 });
 
+// query middleware
+cartSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'items.product',
+    });
+    next();
+});
+
 module.exports = mongoose.model('Cart', cartSchema);

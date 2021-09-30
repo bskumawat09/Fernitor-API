@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 module.exports.getUser = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.params.id).select('-password');
     if (!user) {
         return next(new AppError('user not found', 404));
     }
@@ -16,16 +16,19 @@ module.exports.getUser = catchAsync(async (req, res, next) => {
 })
 
 module.exports.getUserCart = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user.id);
     if (!user) {
         return next(new AppError('user not found', 404));
     }
 
     const products = [];
     for (let item of user.cart.items) {
-        const product = await Product.findById(item._id).select('-createdAt -updatedAt');
+        const product = await Product.findById(item._id).select('-createdAt -updatedAt -seller');
         products.push(product);
     }
+
+    // const cart = await Cart.findById(user.cart);
+
     res.status(200).json({
         status: 'success',
         result: products.length,
@@ -38,7 +41,7 @@ module.exports.getUserCart = catchAsync(async (req, res, next) => {
 
 module.exports.addToCart = catchAsync(async (req, res) => {
     const { pid } = req.params;
-    let quantity = 1;
+    let quantity = req.body.quantity || 1;
     const product = await Product.findById(pid);
 
     const user = await User.findById(req.user.id);
@@ -49,28 +52,46 @@ module.exports.addToCart = catchAsync(async (req, res) => {
     const cart = await Cart.findById(user.cart);
     cart.items.push({ _id: pid, quantity });
     cart.bill += quantity * product.price;
-    await cart.save();
 
+    await cart.save();
     await user.save();
+
     res.status(201).json({
         status: 'success',
-        message: 'product added to cart successfully'
+        message: 'product added to cart successfully',
+        product: {
+            name: product.name,
+            price: product.price
+        }
     });
 })
 
-// module.exports.removeFromCart = catchAsync(async (req, res, next) => {
-//     const { id, pid } = req.params;
-//     const user = await User.findById(id);
-//     if (!user) {
-//         next(new AppError('user not found', 404));
-//     }
-//     // const cart = await Cart.findById(user.cart);
-//     await Cart.findByIdAndUpdate(user.cart, { $pull: { product: pid } })    // TODO: Remove from cart
-//     res.status(201).redirect(`/users/${id}/cart`);
-// })
+module.exports.removeFromCart = catchAsync(async (req, res, next) => {
+    const { pid } = req.params;
+    const user = await User.findById(req.user.id);
+
+    const product = await Product.findById(pid);
+    //TODO: If product does not exist in cart then we should not able to delete it
+
+    const cart = await Cart.findByIdAndUpdate(user.cart, { $pull: { items: { _id: pid } } });
+    cart.bill = cart.bill - product.price;
+
+    cart.save();
+    user.save();
+
+    res.status(200).json({
+        status: 'success',
+        message: 'product removed successfully',
+        product: {
+            name: product.name,
+            price: product.price
+        }
+    });
+})
 
 module.exports.getUserProducts = catchAsync(async (req, res, next) => {
     const products = await Product.find({ seller: req.params.id });
+
     res.status(200).json({
         status: 'success',
         result: products.length,

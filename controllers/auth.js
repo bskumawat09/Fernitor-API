@@ -6,10 +6,16 @@ const AppError = require('../utils/appError');
 
 const createToken = (id, role) => {
     const secret = process.env.SECRET;
-    return jwt.sign({ id, role }, secret, { expiresIn: 24 * 60 * 60 });
+    return jwt.sign({ id, role }, secret, { expiresIn: "2d" });
 }
 
 module.exports.login = catchAsync(async (req, res, next) => {
+
+    const jwtToken = req.cookies.jwt;
+    if (jwtToken) {
+        return next(new AppError('you are already logged in', 400));
+    }
+
     const { email, password } = req.body.user;
     if (!email || !password) {
         return next(new AppError('please provide email and password', 400));
@@ -49,12 +55,12 @@ module.exports.register = catchAsync(async (req, res) => {
 })
 
 module.exports.registerSeller = catchAsync(async (req, res) => {
-    const { seller } = req.body;
-    seller.role = 'seller';
-    const newSeller = new User(seller);
+    const { user } = req.body;
+    user.role = 'seller';
+    const newSeller = new User(user);
     await newSeller.save();
 
-    await User.login(seller.email, seller.password);
+    await User.login(user.email, user.password);
 
     const token = createToken(newSeller._id, newSeller.role);
     res.cookie('jwt', token, { httpOnly: true });

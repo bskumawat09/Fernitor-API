@@ -27,6 +27,10 @@ const productSchema = new Schema(
             type: String,
             default: null
         },
+        isFeatured: {
+            type: Boolean,
+            default: false
+        },
         seller: {
             type: Schema.Types.ObjectId,
             ref: 'User'
@@ -54,8 +58,7 @@ productSchema.post('findOneAndDelete', async (doc) => {
 productSchema.pre(/^find/, function (next) {
     this.populate({
         path: 'seller',
-        select: '-__v -password -createdAt -updatedAt',
-        populate: { path: 'cart' }
+        select: '-__v -password -createdAt -updatedAt'
     });
     next();
 });

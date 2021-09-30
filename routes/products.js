@@ -1,5 +1,5 @@
 const express = require('express');
-const { isLoggedIn, validateProduct } = require('../middleware');
+const { isLoggedIn, permit, validateProduct } = require('../middleware');
 const multer = require('multer');
 const { multerStorage } = require('../cloudinary');
 const productController = require('../controllers/products');
@@ -16,6 +16,7 @@ router.get('/',
 // create new product
 router.post('/',
     isLoggedIn,
+    permit('seller', 'admin'),
     upload.single('image'),
     validateProduct,
     productController.addNewProduct
@@ -29,6 +30,7 @@ router.get('/:id',
 // edit product
 router.put('/:id',
     isLoggedIn,
+    permit('seller', 'admin'),
     upload.single('image'),
     productController.editProduct
 );
@@ -36,6 +38,7 @@ router.put('/:id',
 // delete product
 router.delete('/:id',
     isLoggedIn,
+    permit('seller', 'admin'),
     productController.removeProduct
 );
 

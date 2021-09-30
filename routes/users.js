@@ -1,5 +1,5 @@
 const express = require('express');
-const { validateUser, isLoggedIn, permit } = require('../middleware');
+const { validateUser, isLoggedIn, isAuthor, permit } = require('../middleware');
 const userController = require('../controllers/users');
 const authController = require('../controllers/auth');
 
@@ -23,29 +23,39 @@ router.get('/logout',
     authController.logout
 );
 
-// get single user
-router.get('/account',
-    isLoggedIn,
-    userController.getUser
-);
-
 // get cart associated with the user
-router.get('/:id/cart',
+router.get('/cart',
     isLoggedIn,
+    permit('user'),
     userController.getUserCart
 );
 
 // add product to cart
 router.post('/cart/:pid',
     isLoggedIn,
+    permit('user'),
     userController.addToCart
+);
+
+// remove product from cart
+router.delete('/cart/:pid',
+    isLoggedIn,
+    permit('user'),
+    userController.removeFromCart
 );
 
 // get all the products associated with the user
 router.get('/:id/products',
     isLoggedIn,
-    permit('seller'),
+    permit('seller', 'admin'),
     userController.getUserProducts
+);
+
+// get single user
+router.get('/:id',
+    isLoggedIn,
+    isAuthor,
+    userController.getUser
 );
 
 module.exports = router;
