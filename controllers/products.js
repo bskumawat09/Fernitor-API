@@ -14,16 +14,27 @@ module.exports.getProducts = catchAsync(async (req, res) => {
     queryObj = JSON.parse(queryString);
 
     const products = await Product.find(queryObj);
+
     res.status(200).json({
         status: 'success',
-        result: products.length,
+        results: products.length,
+        products: products
+    });
+})
+
+module.exports.getProductsByCategory = catchAsync(async (req, res) => {
+    const { category } = req.params;
+    const products = await Product.find({ category });
+
+    res.status(200).json({
+        status: 'success',
+        results: products.length,
         products: products
     });
 })
 
 module.exports.addNewProduct = catchAsync(async (req, res) => {
     const { product } = req.body;
-    product.seller = req.user.id;
 
     const newProduct = new Product(product);
     const imgFile = req.file;
@@ -31,6 +42,7 @@ module.exports.addNewProduct = catchAsync(async (req, res) => {
         newProduct.image = { url: imgFile.path, filename: imgFile.filename };
     }
     await newProduct.save();
+
     res.status(201).json({
         status: 'success',
         product: newProduct
@@ -38,7 +50,7 @@ module.exports.addNewProduct = catchAsync(async (req, res) => {
 })
 
 module.exports.getSingleProduct = catchAsync(async (req, res, next) => {
-    const product = await Product.findById(req.params.id).populate({
+    const product = await Product.findById(req.params.pid).populate({
         path: 'reviews',
         populate: {
             path: 'author',  // review's author
@@ -55,9 +67,13 @@ module.exports.getSingleProduct = catchAsync(async (req, res, next) => {
 })
 
 module.exports.editProduct = catchAsync(async (req, res) => {
-    const { id } = req.params;
+    const { pid } = req.params;
     const { product } = req.body;
-    const updatedProduct = await Product.findByIdAndUpdate(id, { $set: product }, { new: true });
+
+    const updatedProduct = await Product.findByIdAndUpdate(pid,
+        { $set: product },
+        { new: true }
+    );
 
     if (!updatedProduct) {
         return next(new AppError('product not found', 404));
@@ -74,13 +90,16 @@ module.exports.editProduct = catchAsync(async (req, res) => {
 })
 
 module.exports.removeProduct = catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
+    const { pid } = req.params;
+    const product = await Product.findByIdAndDelete(pid);
     if (!product) {
         return next(new AppError('product not found', 404));
     }
     res.status(201).json({
         status: 'success',
-        message: "product is deleted"
+        message: "product is deleted",
+        product: {
+            name: product.name
+        }
     });
 })

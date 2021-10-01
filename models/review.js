@@ -1,22 +1,20 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const reviewSchema = new Schema({
-    description: String,
-    rating: Number,
-    author: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+const reviewSchema = new Schema(
+    {
+        rating: Number,
+        description: String,
+        author: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        product: {
+            type: Schema.Types.ObjectId,
+            ref: 'Product'
+        }
     },
-    product: {
-        type: Schema.Types.ObjectId,
-        ref: 'Product'
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+    { timestamps: true });
 
 reviewSchema.pre(/^find/, function (next) {
     this.populate({

@@ -10,52 +10,59 @@ router.post('/register',
     authController.register
 );
 
-router.post('/registerSeller',
-    validateUser,
-    authController.registerSeller
-);
-
 router.post('/login',
     authController.login
 );
 
 router.get('/logout',
+    isLoggedIn,
     authController.logout
 );
 
-// get cart associated with the user
-router.get('/cart',
+// get all users
+router.get('/',
     isLoggedIn,
+    permit('admin'),
+    userController.getUsers
+);
+
+// get user's cart
+router.get('/:uid/cart',
+    isLoggedIn,
+    isAuthor,
     permit('user'),
     userController.getUserCart
 );
 
 // add product to cart
-router.post('/cart/:pid',
+router.post('/:uid/cart/:pid',
     isLoggedIn,
+    isAuthor,
     permit('user'),
     userController.addToCart
 );
 
 // remove product from cart
-router.delete('/cart/:pid',
+router.delete('/:uid/cart/:pid',
     isLoggedIn,
+    isAuthor,
     permit('user'),
     userController.removeFromCart
 );
 
-// get all the products associated with the user
-router.get('/:id/products',
-    isLoggedIn,
-    permit('seller', 'admin'),
-    userController.getUserProducts
-);
-
-// get single user
-router.get('/:id',
+// get a user
+router.get('/:uid',
     isLoggedIn,
     isAuthor,
     userController.getUser
+);
+
+// update user
+router.put('/:uid',
+    isLoggedIn,
+    isAuthor,
+    permit('user'),
+    userController.updateUser
 );
 
 module.exports = router;

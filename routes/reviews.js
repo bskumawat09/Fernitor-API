@@ -1,50 +1,41 @@
 const express = require('express');
-const Review = require('../models/review');
-const Product = require('../models/product');
-const { isLoggedIn, validateReview } = require('../middleware');
-const AppError = require('../utils/appError');
+const reviewController = require('../controllers/reviews');
+const { isLoggedIn, permit, validateReview } = require('../middleware');
 
 const router = express.Router({ mergeParams: true });
 
-// get reviews associated with a product
-router.get('/', async (req, res) => {
-    const reviews = await Review.find({ product: req.params.id });
-    res.status(200).json({
-        status: "success",
-        reviews: reviews
-    });
-});
+// get all reviews
+router.get('/',
+    isLoggedIn,
+    permit('admin'),
+    reviewController.getReviews
+);
+
+// get all reviews associated with product
+router.get('/products/:pid',
+    reviewController.getProductReviews
+);
+
+// get all reviews associated with user
+router.get('/users/:uid',
+    isLoggedIn,
+    permit('admin'),
+    reviewController.getUserReviews
+);
 
 // create review
-router.post('/', isLoggedIn, validateReview, async (req, res) => {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-        next(new AppError('product not found', 404));
-    }
-    const review = new Review(req.body.review);
-    review.author = req.user.id;
-    review.product = product._id;
-
-    await review.save();
-    await product.save();
-
-    res.status(201).json({
-        status: "success",
-        message: "added new review",
-        review: review
-    });
-});
+router.post('/products/:pid',
+    isLoggedIn,
+    permit('user'),
+    validateReview,
+    reviewController.addReview
+);
 
 // delete review
-router.delete('/:reviewId', isLoggedIn, async (req, res) => {
-    const { reviewId } = req.params;
-    await Review.findByIdAndDelete(reviewId);
-
-    res.status(201).json({
-        status: "success",
-        message: "review deleted"
-    });
-});
+router.delete('/:rid',
+    isLoggedIn,
+    permit('user'),
+    reviewController.deleteReview
+);
 
 module.exports = router;
-

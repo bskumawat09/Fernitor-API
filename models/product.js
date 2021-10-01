@@ -30,10 +30,6 @@ const productSchema = new Schema(
         isFeatured: {
             type: Boolean,
             default: false
-        },
-        seller: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
         }
     },
     { timestamps: true }
@@ -53,14 +49,6 @@ productSchema.post('findOneAndDelete', async (doc) => {
             _id: { $in: doc.reviews }
         });
     }
-});
-
-productSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: 'seller',
-        select: '-__v -password -createdAt -updatedAt'
-    });
-    next();
 });
 
 module.exports = mongoose.model('Product', productSchema);

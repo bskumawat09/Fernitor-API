@@ -10,15 +10,13 @@ const cartSchema = new Schema({
             },
             quantity: {
                 type: Number,
-                required: true,
                 min: [1, 'quantity can not be less then 1'],
                 default: 1
             }
         }
     ],
-    bill: {
+    amount: {
         type: Number,
-        required: true,
         default: 0
     }
 });

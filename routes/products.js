@@ -13,32 +13,36 @@ router.get('/',
     productController.getProducts
 );
 
+router.get('/shop/:category',
+    productController.getProductsByCategory
+);
+
 // create new product
 router.post('/',
     isLoggedIn,
-    permit('seller', 'admin'),
+    permit('admin'),
     upload.single('image'),
     validateProduct,
     productController.addNewProduct
 );
 
 // get single product
-router.get('/:id',
+router.get('/:pid',
     productController.getSingleProduct
 );
 
 // edit product
-router.put('/:id',
+router.put('/:pid',
     isLoggedIn,
-    permit('seller', 'admin'),
+    permit('admin'),
     upload.single('image'),
     productController.editProduct
 );
 
 // delete product
-router.delete('/:id',
+router.delete('/:pid',
     isLoggedIn,
-    permit('seller', 'admin'),
+    permit('admin'),
     productController.removeProduct
 );
 

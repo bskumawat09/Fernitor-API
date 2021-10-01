@@ -33,21 +33,20 @@ module.exports.isLoggedIn = (req, res, next) => {
 }
 
 module.exports.isAuthor = (req, res, next) => {
-    const loggedUser = req.user;
-    if (loggedUser.role !== "admin" && loggedUser.id !== req.params.id) {
-        return next(new AppError('you are not authorized to perform this operation', 403));
+    if (req.user.role === "admin" || req.params.uid === req.user.id) {
+        return next();
     }
-    next();
+    next(new AppError('you are not authorized person', 403));
 }
 
 // middleware for doing role-based permissions
 module.exports.permit = function (...permittedRoles) {
     return async (req, res, next) => {
         const { user } = req;
-        if (user && permittedRoles.includes(user.role)) {
+        if (permittedRoles.includes(user.role)) {
             return next();
         }
-        next(new AppError('you are not authorized to access this resource', 403));
+        next(new AppError('you do not have permission', 403));
     }
 }
 

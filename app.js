@@ -30,7 +30,7 @@ app.use(Cors());
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/products/:id/reviews', reviewRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 /* API endpoints */
 app.get('/api', (req, res) => {

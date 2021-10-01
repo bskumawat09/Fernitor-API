@@ -20,13 +20,16 @@ const orderSchema = new Schema(
                 },
             }
         ],
-        bill: {
+        amount: {
             type: Number,
             required: true
         },
         address: {
             type: String,
             required: true
+        },
+        status: {
+            type: String
         }
     },
     { timestamps: true }

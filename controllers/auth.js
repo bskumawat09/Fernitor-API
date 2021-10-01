@@ -13,7 +13,7 @@ module.exports.login = catchAsync(async (req, res, next) => {
 
     const jwtToken = req.cookies.jwt;
     if (jwtToken) {
-        return next(new AppError('you are already logged in', 400));
+        return next(new AppError('you are already logged in with current account', 400));
     }
 
     const { email, password } = req.body.user;
@@ -54,26 +54,27 @@ module.exports.register = catchAsync(async (req, res) => {
     });
 })
 
-module.exports.registerSeller = catchAsync(async (req, res) => {
+module.exports.registerAdmin = catchAsync(async (req, res) => {
     const { user } = req.body;
-    user.role = 'seller';
-    const newSeller = new User(user);
-    await newSeller.save();
+    user.role = 'admin';
+    const newAdmin = new User(user);
+    await newAdmin.save();
 
     await User.login(user.email, user.password);
 
-    const token = createToken(newSeller._id, newSeller.role);
+    const token = createToken(newAdmin._id, newAdmin.role);
     res.cookie('jwt', token, { httpOnly: true });
 
     res.status(201).json({
         status: "success",
         message: "registered successfully",
-        seller: newSeller
+        admin: newAdmin
     })
 })
 
 module.exports.logout = (req, res) => {
     res.cookie('jwt', '', { maxAge: 1 });
+
     res.status(200).json({
         status: "success",
         message: "logged out"
