@@ -4,8 +4,9 @@ const Cart = require('../models/cart');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-module.exports.getUsers = catchAsync(async (req, res, next) => {
-    const users = await User.find();
+module.exports.getUsers = catchAsync(async (req, res) => {
+    const query = req.query.new;
+    const users = query ? await User.find().limit(5).sort({ createdAt: -1 }) : await User.find();
 
     const usrs = users.map((user) => {
         const { password, ...others } = user._doc;
@@ -123,5 +124,35 @@ module.exports.removeFromCart = catchAsync(async (req, res, next) => {
             name: product.name,
             price: product.price
         }
+    });
+})
+
+// get registered users by months
+module.exports.getUserStats = catchAsync(async (req, res) => {
+    const date = new Date();
+    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+
+    const data = await User.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: lastYear }
+            }
+        },
+        {
+            $project: {
+                month: { $month: "$createdAt" }
+            }
+        },
+        {
+            $group: {
+                _id: "$month",
+                total: { $sum: 1 }
+            }
+        }
+    ]);
+
+    res.status(200).json({
+        staus: 'success',
+        data: data
     });
 })

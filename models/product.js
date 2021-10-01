@@ -18,8 +18,8 @@ const productSchema = new Schema(
             lowercase: true,
             default: null
         },
-        category: {
-            type: String,
+        categories: {
+            type: [String],
             lowercase: true
         },
         quantity: Number,

@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const Cors = require('cors');
 
 const { connectDB } = require('./dbconnect');
+const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const reviewRoutes = require('./routes/reviews');
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(Cors());
 
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reviews', reviewRoutes);

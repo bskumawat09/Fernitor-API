@@ -24,7 +24,11 @@ module.exports.getProducts = catchAsync(async (req, res) => {
 
 module.exports.getProductsByCategory = catchAsync(async (req, res) => {
     const { category } = req.params;
-    const products = await Product.find({ category });
+    const { featured } = req.query;
+
+    const products = featured
+        ? await Product.find({ isFeatured: true })
+        : await Product.find({ categories: { $in: [category] } });
 
     res.status(200).json({
         status: 'success',
