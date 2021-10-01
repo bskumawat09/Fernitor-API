@@ -29,7 +29,9 @@ const orderSchema = new Schema(
             required: true
         },
         status: {
-            type: String
+            type: String,
+            default: 'pending',
+            lowercase: true
         }
     },
     { timestamps: true }

@@ -11,6 +11,7 @@ const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
 const reviewRoutes = require('./routes/reviews');
+const orderRoutes = require('./routes/orders');
 const AppError = require('./utils/appError');
 const errorHandler = require('./controllers/errors');
 
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/orders', orderRoutes);
 
 /* API endpoints */
 app.get('/api', (req, res) => {
