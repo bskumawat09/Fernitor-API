@@ -22,20 +22,20 @@ module.exports.getProducts = catchAsync(async (req, res) => {
     });
 })
 
-module.exports.getProductsByCategory = catchAsync(async (req, res) => {
-    const { category } = req.params;
-    const { featured } = req.query;
+// module.exports.getProductsByCategory = catchAsync(async (req, res) => {
+//     const { category } = req.params;
+//     const { featured } = req.query;
 
-    const products = featured
-        ? await Product.find({ isFeatured: true })
-        : await Product.find({ categories: { $in: [category] } });
+//     const products = featured
+//         ? await Product.find({ isFeatured: true })
+//         : await Product.find({ categories: { $in: [category] } });
 
-    res.status(200).json({
-        status: 'success',
-        results: products.length,
-        products: products
-    });
-})
+//     res.status(200).json({
+//         status: 'success',
+//         results: products.length,
+//         products: products
+//     });
+// })
 
 module.exports.addNewProduct = catchAsync(async (req, res) => {
     const { product } = req.body;
@@ -70,7 +70,7 @@ module.exports.getSingleProduct = catchAsync(async (req, res, next) => {
     });
 })
 
-module.exports.editProduct = catchAsync(async (req, res) => {
+module.exports.editProduct = catchAsync(async (req, res, next) => {
     const { pid } = req.params;
     const { product } = req.body;
 

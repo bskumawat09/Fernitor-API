@@ -7,12 +7,14 @@ const catchAsync = require('./utils/catchAsync');
 // middleware for authentication
 module.exports.isLoggedIn = (req, res, next) => {
     const secret = process.env.SECRET;
-    const token = req.cookies.jwt;
-    // const authHeader = req.headers.token;
+    // const token = req.cookies.jwt;
+    const authHeader = req.headers.token;
 
-    if (!token) {
+    if (!authHeader) {
         return next(new AppError('you are not authenticated, please login', 403));
     }
+
+    const token = authHeader.split(' ')[2];
 
     jwt.verify(token, secret, catchAsync(async (err, decodedToken) => {
         if (err) {

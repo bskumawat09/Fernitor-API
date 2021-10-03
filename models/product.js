@@ -16,10 +16,9 @@ const productSchema = new Schema(
         color: {
             type: String,
             lowercase: true,
-            default: null
         },
-        categories: {
-            type: [String],
+        category: {
+            type: String,
             lowercase: true
         },
         quantity: Number,
@@ -30,6 +29,10 @@ const productSchema = new Schema(
         isFeatured: {
             type: Boolean,
             default: false
+        },
+        inStock: {
+            type: Boolean,
+            defualt: true
         }
     },
     { timestamps: true }

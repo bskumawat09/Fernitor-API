@@ -13,9 +13,9 @@ router.get('/',
     productController.getProducts
 );
 
-router.get('/shop/:category',
-    productController.getProductsByCategory
-);
+// router.get('/shop/:category',
+//     productController.getProductsByCategory
+// );
 
 // create new product
 router.post('/',

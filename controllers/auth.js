@@ -11,10 +11,10 @@ const createToken = (id, role) => {
 
 module.exports.login = catchAsync(async (req, res, next) => {
 
-    const jwtToken = req.cookies.jwt;
-    if (jwtToken) {
-        return next(new AppError('you are already logged in with current account', 400));
-    }
+    // const jwtToken = req.cookies.jwt;
+    // if (jwtToken) {
+    //     return next(new AppError('you are already logged in with current account', 400));
+    // }
 
     const { email, password } = req.body.user;
     if (!email || !password) {
