@@ -6,7 +6,9 @@ const AppError = require('../utils/appError');
 
 module.exports.getUsers = catchAsync(async (req, res) => {
     const query = req.query.new;
-    const users = query ? await User.find().limit(5).sort({ createdAt: -1 }) : await User.find();
+    const users = query
+        ? await User.find().limit(5).sort({ createdAt: -1 })
+        : await User.find();
 
     const usrs = users.map((user) => {
         const { password, ...others } = user._doc;
@@ -71,59 +73,80 @@ module.exports.getUserCart = catchAsync(async (req, res, next) => {
     });
 })
 
+// module.exports.addToCart = catchAsync(async (req, res) => {
+//     const { pid } = req.params;
+//     let quantity = req.body.quantity || 1;
+//     const product = await Product.findById(pid);
+
+//     const user = await User.findById(req.params.uid);
+//     if (!user) {
+//         return next(new AppError('user not found', 404));
+//     }
+
+//     const cart = await Cart.findById(user.cart);
+//     cart.items.push({ _id: pid, quantity });
+//     cart.amount += (quantity * product.price);
+
+//     await cart.save();
+//     await user.save();
+
+//     res.status(201).json({
+//         status: 'success',
+//         message: 'product added to cart successfully',
+//         product: {
+//             name: product.name,
+//             price: product.price
+//         }
+//     });
+// })
+
 module.exports.addToCart = catchAsync(async (req, res) => {
-    const { pid } = req.params;
-    let quantity = req.body.quantity || 1;
-    const product = await Product.findById(pid);
-
-    const user = await User.findById(req.params.uid);
-    if (!user) {
-        return next(new AppError('user not found', 404));
-    }
-
-    const cart = await Cart.findById(user.cart);
-    cart.items.push({ _id: pid, quantity });
-    cart.amount += (quantity * product.price);
-
-    await cart.save();
+    const { uid } = req.params;
+    const { item } = req.body;
+    const user = await User.findById(uid);
+    const updatedCart = await Cart.findByIdAndUpdate(user.cart,
+        {
+            $push: { items: item }
+        }
+    );
+    updatedCart.amount += item.product.price * item.quantity;
+    await updatedCart.save();
     await user.save();
 
-    res.status(201).json({
+    res.status(200).json({
         status: 'success',
-        message: 'product added to cart successfully',
-        product: {
-            name: product.name,
-            price: product.price
-        }
+        cart: updatedCart
     });
-})
+});
 
 module.exports.removeFromCart = catchAsync(async (req, res, next) => {
     const { uid, pid } = req.params;
     const user = await User.findById(uid);
-
-    const product = await Product.findById(pid);
-    //TODO: If product does not exist in cart then we should not able to delete it
-
-    const cart = await Cart.findByIdAndUpdate(user.cart,
+    const cart = await Cart.findById(user.cart);
+    // const cart = await Cart.findByIdAndUpdate(user.cart,
+    //     {
+    //         $pull: { items: { product: pid } }  // TODO: Fix it
+    //     }
+    // );
+    const removeItems = cart.items.filter(item => item.product._id.equals(pid));
+    if (removeItems.length === 0) {
+        return next(new AppError('item not found in cart', 404));
+    }
+    await Cart.updateOne({ _id: cart._id },
         {
-            $pull: {
-                items: { _id: pid }
-            }
+            $pull: { items: { product: pid } }
         }
     );
-    cart.amount -= product.price;
-
-    cart.save();
-    user.save();
+    removeItems.forEach(item => {
+        cart.amount -= item.product.price * item.quantity;
+    });
+    await cart.save();
+    await user.save();
 
     res.status(200).json({
         status: 'success',
         message: 'product removed successfully',
-        product: {
-            name: product.name,
-            price: product.price
-        }
+        products: removeItems
     });
 })
 

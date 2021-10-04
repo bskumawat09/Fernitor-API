@@ -21,7 +21,6 @@ const productSchema = new Schema(
             type: String,
             lowercase: true
         },
-        quantity: Number,
         description: {
             type: String,
             default: null
@@ -51,6 +50,7 @@ productSchema.post('findOneAndDelete', async (doc) => {
         await Review.deleteMany({
             _id: { $in: doc.reviews }
         });
+        // TODO: Remove product from cart if product no longer exists
     }
 });
 

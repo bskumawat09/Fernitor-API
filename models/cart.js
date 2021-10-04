@@ -10,7 +10,7 @@ const cartSchema = new Schema({
             },
             quantity: {
                 type: Number,
-                min: [1, 'quantity can not be less then 1'],
+                min: [1, 'quantity can not be less than 1'],
                 default: 1
             }
         }

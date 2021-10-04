@@ -20,7 +20,14 @@ router.get('/:uid/cart',
 );
 
 // add product to cart
-router.post('/:uid/cart/:pid',
+// router.post('/:uid/cart/:pid',
+//     isLoggedIn,
+//     isAuthor,
+//     permit('user'),
+//     userController.addToCart
+// );
+
+router.put('/:uid/cart',
     isLoggedIn,
     isAuthor,
     permit('user'),
@@ -31,7 +38,6 @@ router.post('/:uid/cart/:pid',
 router.delete('/:uid/cart/:pid',
     isLoggedIn,
     isAuthor,
-    permit('user'),
     userController.removeFromCart
 );
 

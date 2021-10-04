@@ -14,7 +14,7 @@ module.exports.isLoggedIn = (req, res, next) => {
         return next(new AppError('you are not authenticated, please login', 403));
     }
 
-    const token = authHeader.split(' ')[2];
+    const token = authHeader.split(' ')[1];
 
     jwt.verify(token, secret, catchAsync(async (err, decodedToken) => {
         if (err) {
