@@ -4,9 +4,8 @@ module.exports.productSchema = Joi.object({
     product: Joi.object({
         name: Joi.string().required(),
         price: Joi.number().min(0).required(),
-        description: Joi.string().max(200),
-        color: Joi.string().required(),
-        quantity: Joi.number().min(0).integer().required()
+        description: Joi.string().max(250),
+        color: Joi.string().required()
     }).required().unknown(true)
 });
 

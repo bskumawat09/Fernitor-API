@@ -31,7 +31,11 @@ const productSchema = new Schema(
         },
         inStock: {
             type: Boolean,
-            defualt: true
+            default: true
+        },
+        onSale: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }

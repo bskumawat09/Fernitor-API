@@ -4,6 +4,7 @@ const AppError = require('../utils/appError');
 
 module.exports.getProducts = catchAsync(async (req, res) => {
     // for filtering
+    const { sort } = req.query;
     let queryObj = { ...req.query }; // make a copy (not reference) of query object
     const exclude = ['sort', 'limit', 'page'];
     exclude.forEach(el => delete queryObj[el]);
@@ -13,7 +14,16 @@ module.exports.getProducts = catchAsync(async (req, res) => {
     queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
     queryObj = JSON.parse(queryString);
 
-    const products = await Product.find(queryObj);
+    let products;
+    if (sort === "new") {
+        products = await Product.find(queryObj).sort({ createdAt: -1 });
+    } else if (sort === "asc") {
+        products = await Product.find(queryObj).sort({ price: 1 });
+    } else if (sort === "desc") {
+        products = await Product.find(queryObj).sort({ price: -1 });
+    } else {
+        products = await Product.find(queryObj);
+    }
 
     res.status(200).json({
         status: 'success',
