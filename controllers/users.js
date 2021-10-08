@@ -58,8 +58,9 @@ module.exports.getUserCart = catchAsync(async (req, res, next) => {
 
     const products = [];
     for (let item of user.cart.items) {
-        const product = await Product.findById(item._id).select('-createdAt -updatedAt');
-        products.push(product);
+        const product = await Product.findById(item.product._id).select('-createdAt -updatedAt');
+        const obj = Object.assign({ quantity: item.quantity }, { ...product._doc });
+        products.push(obj);
     }
     // const cart = await Cart.findById(user.cart);
 
