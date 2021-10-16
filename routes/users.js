@@ -1,57 +1,45 @@
-const express = require('express');
-const { isLoggedIn, isAuthor, permit } = require('../middleware');
-const userController = require('../controllers/users');
+const express = require("express")
+const { isLoggedIn, isAuthor, permit } = require("../middleware")
+const userController = require("../controllers/users")
 
-const router = express.Router();
+const router = express.Router()
 
 // get all users
-router.get('/',
-    isLoggedIn,
-    permit('admin'),
-    userController.getUsers
-);
+router.get("/", isLoggedIn, permit("admin"), userController.getUsers)
 
 // get user's cart
-router.get('/:uid/cart',
-    isLoggedIn,
-    isAuthor,
-    permit('user'),
-    userController.getUserCart
-);
+router.get("/:uid/cart", isLoggedIn, isAuthor, userController.getUserCart)
 
 // add product to cart
-router.put('/:uid/cart',
-    isLoggedIn,
-    isAuthor,
-    permit('user'),
-    userController.addToCart
-);
+router.put(
+	"/:uid/cart",
+	isLoggedIn,
+	isAuthor,
+	permit("user"),
+	userController.addToCart
+)
 
 // remove product from cart
-router.delete('/:uid/cart/:pid',
-    isLoggedIn,
-    isAuthor,
-    userController.removeFromCart
-);
+router.delete(
+	"/:uid/cart/:pid",
+	isLoggedIn,
+	isAuthor,
+	userController.removeFromCart
+)
 
 // get user stats
-router.get('/stats',
-    userController.getUserStats
-);
+router.get("/stats", isLoggedIn, permit("admin"), userController.getUserStats)
 
 // get a user
-router.get('/:uid',
-    isLoggedIn,
-    isAuthor,
-    userController.getUser
-);
+router.get("/:uid", isLoggedIn, isAuthor, userController.getUser)
 
 // update user
-router.put('/:uid',
-    isLoggedIn,
-    isAuthor,
-    permit('user'),
-    userController.updateUser
-);
+router.put(
+	"/:uid",
+	isLoggedIn,
+	isAuthor,
+	permit("user"),
+	userController.updateUser
+)
 
-module.exports = router;
+module.exports = router
