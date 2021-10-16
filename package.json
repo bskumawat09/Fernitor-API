@@ -1,5 +1,5 @@
 {
-  "name": "te-furniture-store",
+  "name": "furniture-api",
   "version": "1.0.0",
   "description": "TE group mini project.",
   "main": "app.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bskumawat09/TE-Furniture-Store.git"
+    "url": "git+https://github.com/bskumawat09/Fernitor-API.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bskumawat09/TE-Furniture-Store/issues"
+    "url": "https://github.com/bskumawat09/Fernitor-API/issues"
   },
-  "homepage": "https://github.com/bskumawat09/TE-Furniture-Store#readme",
+  "homepage": "https://github.com/bskumawat09/Fernitor-API#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.26.3",
