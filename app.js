@@ -29,7 +29,8 @@ connectDB(dbUrl);
 /* middlewares */
 app.use(express.json());
 app.use(cookieParser());
-app.use(Cors({ Credential: true }));
+
+app.use(Cors({ Credential: true, origin: "https://fernitor.netlify.app" }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
