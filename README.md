@@ -1,5 +1,5 @@
-# TE-Furniture-Store
-> Fernitor api - TE group mini project.
+# FernitorAPI
+> REST API for online furniture store webapp with full CRUD functionalities, authetication and authorization implemented.
 ## API Documentation
 https://documenter.getpostman.com/view/17116314/TzzDLFow
 ## Base URL
