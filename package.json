@@ -1,7 +1,7 @@
 {
 	"name": "furniture-api",
 	"version": "1.0.0",
-	"description": "Restful api for online furniture store",
+	"description": "RESTful API for Online Furniture Store",
 	"main": "app.js",
 	"scripts": {
 		"start": "node app.js"
@@ -14,9 +14,9 @@
 	"author": "",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/bskumawat09/Fernitor-API/issues"
+		"url": "https://github.com/bskumawat09/fernitor-api/issues"
 	},
-	"homepage": "https://github.com/bskumawat09/Fernitor-API#readme",
+	"homepage": "https://github.com/bskumawat09/fernitor-api",
 	"dependencies": {
 		"bcrypt": "^5.0.1",
 		"cloudinary": "^1.26.3",
