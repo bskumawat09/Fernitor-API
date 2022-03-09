@@ -1,65 +1,69 @@
-const Review = require('../models/review');
-const Product = require('../models/product');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
+const reviewService = require("../services/review-service");
+const productService = require("../services/product-service");
 
 module.exports.getReviews = catchAsync(async (req, res) => {
-    const reviews = await Review.find();
+	const reviews = await reviewService.findReviews();
 
-    res.status(200).json({
-        status: "success",
-        results: reviews.length,
-        reviews: reviews
-    });
-})
+	res.status(200).json({
+		status: "success",
+		results: reviews.length,
+		reviews
+	});
+});
 
 module.exports.getProductReviews = catchAsync(async (req, res) => {
-    const reviews = await Review.find({ product: req.params.pid });
+	const { pid } = req.params;
 
-    res.status(200).json({
-        status: "success",
-        results: reviews.length,
-        reviews: reviews
-    });
-})
+	const reviews = await reviewService.findReviews({ productId: pid });
+
+	res.status(200).json({
+		status: "success",
+		results: reviews.length,
+		reviews
+	});
+});
 
 module.exports.getUserReviews = catchAsync(async (req, res) => {
-    const reviews = await Review.find({ author: req.params.uid });
+	const { uid } = req.params;
 
-    res.status(200).json({
-        status: "success",
-        results: reviews.length,
-        reviews: reviews
-    });
-})
+	const reviews = await reviewService.findReviews({ authorId: uid });
+
+	res.status(200).json({
+		status: "success",
+		results: reviews.length,
+		reviews
+	});
+});
 
 module.exports.addReview = catchAsync(async (req, res) => {
-    const { pid } = req.params;
-    const product = await Product.findById(pid);
-    if (!product) {
-        next(new AppError('product not found', 404));
-    }
-    const review = new Review(req.body.review);
-    review.author = req.user.id;
-    review.product = pid;
+	const { pid } = req.params;
+	const { review } = req.body;
 
-    await review.save();
-    // await product.save();
+	const product = await productService.findOneProduct({ _id: pid });
+	if (!product) {
+		next(new AppError("product not found", 404));
+	}
+	const newReview = await reviewService.createReview({
+		...review,
+		productId: pid,
+		authorId: req.user.id
+	});
 
-    res.status(201).json({
-        status: "success",
-        review: review
-    });
-})
+	res.status(201).json({
+		status: "success",
+		review: newReview
+	});
+});
 
 module.exports.deleteReview = catchAsync(async (req, res) => {
-    const { rid } = req.params;
-    const review = await Review.findByIdAndDelete(rid);
+	const { rid } = req.params;
 
-    res.status(201).json({
-        status: "success",
-        review: {
-            review: review.description
-        }
-    });
-})
+	const review = await reviewService.deleteReview({ _id: rid });
+
+	res.status(201).json({
+		status: "success",
+		review
+	});
+});

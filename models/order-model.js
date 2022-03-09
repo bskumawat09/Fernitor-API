@@ -1,47 +1,47 @@
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const orderSchema = new Schema(
 	{
-		user: {
+		userId: {
 			type: Schema.Types.ObjectId,
-			ref: "User",
+			ref: "User"
 		},
 		items: [
 			{
-				product: {
+				productId: {
 					type: Schema.Types.ObjectId,
-					ref: "Product",
+					ref: "Product"
 				},
 				quantity: {
 					type: Number,
 					required: true,
-					min: [1, "quantity can not be less then 1"],
-				},
-			},
+					min: [1, "quantity can not be less then 1"]
+				}
+			}
 		],
 		amount: {
 			type: Number,
-			required: true,
+			required: true
 		},
 		address: {
 			type: String,
-			required: true,
+			required: true
 		},
 		status: {
 			type: String,
 			default: "pending",
-			lowercase: true,
-		},
+			lowercase: true
+		}
 	},
 	{ timestamps: true }
-)
+);
 
 orderSchema.pre(/^find/, function (next) {
 	this.populate({
-		path: "items.product",
-	})
-	next()
-})
+		path: "items.productId"
+	});
+	next();
+});
 
-module.exports = mongoose.model("Order", orderSchema)
+module.exports = mongoose.model("Order", orderSchema, "orders");
